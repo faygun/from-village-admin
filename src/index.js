@@ -8,7 +8,7 @@ import ProductList from './components/Product/product_list';
 import PostsNew from './components/Product/posts_new';
 import ProductDetail from './components/Product/product_detail';
 import Login from './components/Login/login';
-
+import PrivateRoute from "./containers/private_route";
 import reducers from './reducers';
 import {BrowserRouter, Route, Switch} from 'react-router-dom';
 
@@ -19,10 +19,13 @@ ReactDOM.render(
     <BrowserRouter>
       <div>
         <Switch>  
-        <Route path="/login" component={Login}/>
-          <Route path="/products/new" component={PostsNew}/>
+          <PrivateRoute path="/" component={ProductList} exact/>
+          <PrivateRoute path="/products/new" component={PostsNew} exact/>
+          <PrivateRoute path="/detail/:id" component={ProductDetail} exact/>
+          <Route path="/login" component={Login}/>
+          {/* <Route path="/products/new" component={PostsNew}/>
           <Route path="/detail/:id" component={ProductDetail}/>
-          <Route path="/" component={ProductList}/>
+          <Route path="/" component={ProductList}/> */}
         </Switch>
       </div>
     </BrowserRouter>
