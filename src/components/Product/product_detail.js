@@ -100,8 +100,8 @@ class ProductDetail extends Component{
               </Col>
             </FormGroup>
             <FormGroup>
-                <Col sm={10}>
-                    <Button>Save</Button>
+                <Col sm={{ size: 10, offset: 6 }}>
+                    <Button colSpan={1}>Save</Button>
                     <Button>Cancel</Button>
                 </Col>
             </FormGroup>
