@@ -8,3 +8,10 @@ export function isLogin(){
 export function getUser(){
     return JSON.parse(localStorage.getItem(storeKey));
 }
+
+export const AlertType = {
+    Success : "success",
+    Danger : "danger",
+    Warning : "warning",
+    Info : "info"
+}

@@ -1,15 +1,21 @@
 import React,{Component} from 'react';
-import {fetchProduct, deleteProduct} from '../../actions/Product';
+import ReactDOM from 'react-dom';
+import {fetchProduct, deleteProduct, createOrUpdateProduct} from '../../actions/Product';
 import {connect} from 'react-redux';
-import { Form, FormGroup, Label, CustomInput, Col, Input, FormText, Button } from "reactstrap";
+import { Form, FormGroup, Label, CustomInput, Col, Input, FormText, Button, Alert } from "reactstrap";
+import AlertMessage from '../Common/alert';
+import { AlertType } from '../../helper/user/helper';
+import { append } from '../../helper/common';
 
 class ProductDetail extends Component{
-    // constructor(props){
-    //     super(props);
-    //     this.state = {
-    //         product:{}
-    //     }
-    // }
+    constructor(props){
+        super(props);
+        this.state = {
+            checked:false
+        };
+
+        this.handleSubmit = this.handleSubmit.bind(this);
+    }
     componentDidMount(){
         const {id} = this.props.match.params;
         this.props.fetchProduct(id);
@@ -21,22 +27,52 @@ class ProductDetail extends Component{
             this.props.history.push("/");
         });
     }
+    renderProductStatus(){
+      let states = [{key:0, value:"Yes"}, {key:1, value:"No"}]
+      let value = this.props.product.active ? 0 : 1;
+        return _.map(states, status=>{
+            return(<option key={status.key}  {... (value === status.key  ? {selected:"selected"} : {})} value={status.key}>{status.value}</option>)
+        });
+    }
     renderProductTypes(){
         //REducer dan type lar alınacak.
         let types = [{key:1, value:"Jar"}, {key:2, value:"Meat"}, {key:3, value:"Vegetable"}]
         return _.map(types, type=>{
-            return(<option key={type.key}>{type.value}</option>)
+            return(<option key={type.key}  {... (this.props.product.type === type.value ? {selected:"selected"} : {})} value={type.key}>{type.value}</option>)
         });
     }
+    showMessage(){
+        append(<AlertMessage alertType={AlertType.Success} message="Sucess hedasda fdgfdgdf" />, ".result")
+    }
+    handleSubmit(event){
+      event.preventDefault();
+      const data = new FormData(event.target);
+      var request = {
+        name : data.get("name"),
+        type : data.get("type"),
+        arrivaDate : data.get("arrivaDate"),
+        price : data.get("price"),
+        active : data.get("active"),
+        description : data.get("description"),
+        metaDescription : data.get("metaDescription"),
+        metaKeyword : data.get("metaKeyword")
+      };
+      console.log(event);
+      console.log(event.target);
+      this.props.createOrUpdateProduct(request, ()=>{
+          //event.target.append(this.showMessage());
+          ReactDOM.render(<AlertMessage alertType={AlertType.Success} message="Sucess hedasda fdgfdgdf" />, document.querySelector(".result"))
+          
+      });
+      
+    }
     render(){
-        console.log(this.props.product);
         if(!this.props.product){
             return (<div>Loading...</div>);
         }
 
         return(
-            
-            <Form>
+            <Form onSubmit={this.handleSubmit} className="myForm">
            <FormGroup row>
               <Label for="type" sm={2}>Type</Label>
               <Col sm={10}>
@@ -59,12 +95,11 @@ class ProductDetail extends Component{
             </FormGroup>
             <FormGroup row>
                 <Label for="active" sm={2}>Active</Label>
-                <Col sm={2} >
-                    <CustomInput type="checkbox" id="active" onChange={(e)=>{
-                        e.target.checked = e.target.checked
-                    }} checked={this.props.product.active} label=""/>
-                </Col>
-                
+                <Col sm={10}>
+                <Input type="select" name="active" id="active">
+                  {this.renderProductStatus()}
+                </Input>
+              </Col>
             </FormGroup>
             <FormGroup row>
               <Label for="exampleFile" sm={2}>Image</Label>
@@ -78,13 +113,13 @@ class ProductDetail extends Component{
             <FormGroup row>
               <Label for="metaKeyword" sm={2}>Meta Keyword</Label>
               <Col sm={10}>
-                <Input type="text" name="metaKeyword" id="metaKeyword" placeholder="Please insert a keyword" />
+                <Input type="text" name="metaKeyword" id="metaKeyword" placeholder="Please insert a keyword" value={this.props.product.metaKeyword} />
               </Col>
             </FormGroup>
             <FormGroup row>
               <Label for="metaDescription" sm={2}>Meta Description</Label>
               <Col sm={10}>
-                <Input type="text" name="metaDescription" id="metaDescription" placeholder="Please insert a description" />
+                <Input type="text" name="metaDescription" id="metaDescription" placeholder="Please insert a description" value={this.props.product.metaDescription} />
               </Col>
             </FormGroup>
             <FormGroup row>
@@ -101,10 +136,15 @@ class ProductDetail extends Component{
             </FormGroup>
             <FormGroup>
                 <Col sm={{ size: 10, offset: 6 }}>
-                    <Button colSpan={1}>Save</Button>
-                    <Button>Cancel</Button>
+                    <Button color="primary" className="mr-3" colSpan={1}>Save</Button>
+                    <Button color="danger" onClick={()=>{
+                      this.props.history.push('/');
+                    }}>Cancel</Button>
                 </Col>
             </FormGroup>
+            <div className="result">
+
+            </div>
           </Form>
         );
     }
@@ -114,4 +154,4 @@ function mapStateToProps(state){
     return{product : state.productDetail};
 }
 
-export default connect(mapStateToProps, {fetchProduct, deleteProduct})(ProductDetail);
+export default connect(mapStateToProps, {fetchProduct, deleteProduct, createOrUpdateProduct})(ProductDetail);

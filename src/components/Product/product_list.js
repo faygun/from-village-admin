@@ -34,7 +34,7 @@ class ProductList extends Component{
         return(
         <div>
             <div className="text-xs-right">
-                <Link className="btn btn-primary" to="/posts/new">
+                <Link className="btn btn-primary mb-5" to="/posts/new">
                     Add a Product
                 </Link>
             </div>
